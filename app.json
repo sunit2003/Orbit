@@ -4,7 +4,7 @@
     "slug": "Orbit",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/orbit_splash.png",
     "scheme": "orbit",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -17,7 +17,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.Orbit"
     },
     "web": {
       "output": "static",
@@ -28,9 +29,22 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#000000",
+          "image": "./assets/images/orbit_splash.png",
+          "imageWidth": 80
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Gilroy-Bold.ttf",
+            "./assets/fonts/Gilroy-Heavy.ttf",
+            "./assets/fonts/Gilroy-Light.ttf",
+            "./assets/fonts/Gilroy-Medium.ttf",
+            "./assets/fonts/Gilroy-Regular.ttf",
+            "./assets/fonts/Gilroy-SemiBold.ttf"
+          ]
         }
       ]
     ],

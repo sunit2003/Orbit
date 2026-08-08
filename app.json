@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Orbit",
-    "slug": "Orbit",
+    "name": "Orbit Expense Tracker",
+    "slug": "Orbit Expense Tracker",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/orbit_splash.png",
+    "icon": "./assets/images/orbitIcon.png",
     "scheme": "orbit",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -12,10 +12,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#000000",
+        "foregroundImage": "./assets/images/orbitIcon.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.Orbit"
@@ -30,8 +28,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#000000",
-          "image": "./assets/images/orbit_splash.png",
-          "imageWidth": 80
+          "image": "./assets/images/orbit_splash_new.png",
+          "imageWidth": 120
         }
       ],
       [

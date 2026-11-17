@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@expo/ui": "~57.0.6",
+    "@expo/vector-icons": "^15.1.1",
     "@react-native-community/datetimepicker": "^9.1.0",
     "@react-native-vector-icons/ionicons": "^13.1.2",
     "@react-native-vector-icons/material-icons": "^13.1.2",
@@ -16,6 +17,7 @@
     "expo-linking": "~57.0.3",
     "expo-router": "~57.0.6",
     "expo-splash-screen": "~57.0.4",
+    "expo-sqlite": "~57.0.1",
     "expo-status-bar": "~57.0.1",
     "expo-symbols": "~57.0.1",
     "expo-system-ui": "~57.0.1",

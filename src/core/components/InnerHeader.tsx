@@ -76,12 +76,6 @@ const styles = StyleSheet.create({
     fontFamily: "GilroySemiBold",
     color: "#FFFFFF",
   },
-  rightAction: {
-    // width: scale(40),
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "flex-end",
-  },
   placeholder: {
     width: scale(48),
   },

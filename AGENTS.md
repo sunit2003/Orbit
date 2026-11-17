@@ -1,7 +1,3 @@
-# Expo HAS CHANGED
-
-Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before writing any code.
-
 ROLE & EXPERIENCE:
 
 You are a senior React Native engineer with 10+ years of experience building scalable fintech apps

@@ -1,19 +1,118 @@
 import AvatarContainer from "@/core/components/AvatarContainer";
 import BalanceCard from "@/core/components/BalanceCard";
+import { getTotalBalance } from "@/core/utils/dbQueries";
 import { normalizeFont, scale, verticalScale } from "@/core/utils/scaling";
-import { useRouter } from "expo-router";
+import { db, getDatabaseTables } from "@/database/database";
+import { Feather } from "@expo/vector-icons";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   Image,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [totalBalance, setTotalBalance] = useState<number>(() =>
+    getTotalBalance(),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      setTotalBalance(getTotalBalance());
+    }, []),
+  );
+
+  const handlePrintTables = () => {
+    try {
+      const tables = getDatabaseTables();
+      console.log("\n==============================================");
+      console.log("🔍 FOUND TABLES:", tables.join(", "));
+      console.log("==============================================");
+
+      tables.forEach((table) => {
+        // Get column definitions
+        const columnsInfo = db.getAllSync<{ name: string }>(
+          `PRAGMA table_info(${table});`,
+        );
+        const colNames = columnsInfo.map((col) => col.name);
+
+        if (colNames.length === 0) return;
+
+        // Fetch rows
+        const rows = db.getAllSync<any>(`SELECT * FROM ${table};`);
+
+        // Calculate max width for each column to align properly
+        const colWidths: Record<string, number> = {};
+        colNames.forEach((name) => {
+          colWidths[name] = name.length;
+        });
+
+        rows.forEach((row) => {
+          colNames.forEach((name) => {
+            const val = String(
+              row[name] !== null && row[name] !== undefined
+                ? row[name]
+                : "NULL",
+            );
+            if (val.length > colWidths[name]) {
+              colWidths[name] = val.length;
+            }
+          });
+        });
+
+        // Build the divider line (+-----+-----+...)
+        const divider =
+          "+" +
+          colNames.map((name) => "-".repeat(colWidths[name] + 2)).join("+") +
+          "+";
+
+        // Build the header line (| column_name | ...)
+        const header =
+          "|" +
+          colNames
+            .map((name) => ` ${name.padEnd(colWidths[name])} `)
+            .join("|") +
+          "|";
+
+        console.log(`\n📋 TABLE: ${table} (${rows.length} rows)`);
+        console.log(divider);
+        console.log(header);
+        console.log(divider);
+
+        if (rows.length === 0) {
+          console.log(`| ${"(empty table)".padEnd(divider.length - 4)} |`);
+        } else {
+          rows.forEach((row) => {
+            const rowStr =
+              "|" +
+              colNames
+                .map((name) => {
+                  const val = String(
+                    row[name] !== null && row[name] !== undefined
+                      ? row[name]
+                      : "NULL",
+                  );
+                  return ` ${val.padEnd(colWidths[name])} `;
+                })
+                .join("|") +
+              "|";
+            console.log(rowStr);
+          });
+        }
+        console.log(divider);
+      });
+      console.log("\n==============================================\n");
+    } catch (error) {
+      console.error("❌ Error printing database tables:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -32,10 +131,32 @@ export default function HomeScreen() {
             <Text style={styles.headerText}>sunit!</Text>
           </View>
           <View style={[styles.cardContainer, styles.firstCardOverlap]}>
-            <BalanceCard />
+            <BalanceCard totalBalance={totalBalance} />
+          </View>
+
+          <View style={styles.recentTrxContainer}>
+            <Text style={styles.recentTrxText}>Last 5 Tranactions</Text>
+            <TouchableOpacity
+              style={styles.viewAllTrxBtn}
+              onPress={() => {
+                router.push("/allTransactions");
+              }}
+            >
+              <Text style={styles.recentTrxViewAllText}>View All</Text>
+              <Feather name="chevron-right" size={18} color="#52B3AD" />
+            </TouchableOpacity>
           </View>
         </SafeAreaView>
       </ScrollView>
+
+      {/* Floating Action Button to Print Tables */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={handlePrintTables}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.fabText}>Database</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -96,5 +217,50 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: normalizeFont(38),
     textTransform: "uppercase",
+  },
+  fab: {
+    position: "absolute",
+    bottom: verticalScale(100),
+    right: scale(20),
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: scale(16),
+    paddingVertical: verticalScale(12),
+    borderRadius: scale(25),
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 10,
+    zIndex: 99,
+  },
+  fabText: {
+    color: "#000000",
+    fontSize: normalizeFont(12),
+    fontFamily: "Gilroy-Bold",
+  },
+  recentTrxContainer: {
+    // backgroundColor: "red",
+    marginTop: verticalScale(10),
+    marginHorizontal: scale(16),
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  recentTrxText: {
+    fontFamily: "GilroyMedium",
+    fontSize: normalizeFont(22),
+    color: "#FFFFFF",
+  },
+  viewAllTrxBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: verticalScale(3),
+  },
+  recentTrxViewAllText: {
+    fontFamily: "GilroyMedium",
+    fontSize: normalizeFont(16),
+    color: "#52B3AD",
   },
 });

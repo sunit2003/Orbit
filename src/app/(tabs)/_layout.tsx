@@ -135,7 +135,7 @@ export default function TabLayout() {
           tabBarItemStyle: { transform: [{ translateX: 0 }] },
           tabBarIcon: ({ color }) => (
             <Image
-              source={require("@/assets/images/wallet.png")}
+              source={require("@/assets/images/bankIcon.png")}
               style={{ width: 28, height: 28, tintColor: color }}
               resizeMode="contain"
             />

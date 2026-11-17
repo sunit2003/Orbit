@@ -5,7 +5,17 @@ import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 import { formatToINR } from "../utils/formatValue";
-export default function BalanceCard() {
+
+interface BalanceCardProps {
+  totalBalance: number;
+  income?: number;
+  expenses?: number;
+}
+export default function BalanceCard({
+  totalBalance,
+  income,
+  expenses,
+}: BalanceCardProps) {
   const router = useRouter();
 
   return (
@@ -56,7 +66,7 @@ export default function BalanceCard() {
         <View style={styles.valueSection}>
           <View style={styles.maskRowMain}>
             <Text style={styles.mainValue}>{"₹"}</Text>
-            <Text style={styles.mainValue}>{formatToINR("10342.67")}</Text>
+            <Text style={styles.mainValue}>{formatToINR(totalBalance)}</Text>
           </View>
         </View>
         <View style={styles.cardRow}>

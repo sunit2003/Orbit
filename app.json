@@ -44,7 +44,8 @@
             "./assets/fonts/Gilroy-SemiBold.ttf"
           ]
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

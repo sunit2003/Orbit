@@ -1,16 +1,28 @@
-import { getExpenseCategoryItems } from "@/constants/mockData";
+import {
+  getExpenseCategoryItems,
+  getIncomeCategoryItems,
+} from "@/constants/mockData";
 import {
   TRANSACTION_COLORS,
   TransactionType,
 } from "@/constants/transactionColors";
+import {
+  ExpenseCategoryType,
+  IncomeCategoryType,
+  PaymentModeType,
+} from "@/constants/types";
+import { AppPopup, PopupType } from "@/core/components/AppPopup";
 import { ExpenseCategoryModal } from "@/core/components/ExpenseCategoryModal";
+import { IncomeCategoryModal } from "@/core/components/IncomeCategoryModal";
 import { InnerHeader } from "@/core/components/InnerHeader";
+import { PaymentModeModal } from "@/core/components/PaymentModeModal";
 import { SegmentControl } from "@/core/components/SegmentControl";
+import { addExpense, getPaymentModes } from "@/core/utils/dbQueries";
 import { normalizeFont, scale, verticalScale } from "@/core/utils/scaling";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Ionicons from "@react-native-vector-icons/ionicons";
 import MaterialIcons from "@react-native-vector-icons/material-icons";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {
   Image,
@@ -26,21 +38,101 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const options = ["Expense", "Income", "Transfer"];
 export default function TransactionScreen() {
+  const router = useRouter();
   const [selectedOption, setSelectedOption] =
     useState<TransactionType>("Expense");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedTime, setSelectedTime] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [isCatgeoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [isExpenseCatgeoryModalVisible, setIsExpenseCategoryModalVisible] =
+    useState(false);
+  const [isIncomeCatgeoryModalVisible, setIsIncomeCategoryModalVisible] =
+    useState(false);
+  const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
   const [selectedCatgeoryId, setSelectedCatgeoryId] = useState<string | null>(
     null,
   );
+  const [selectedPaymentModeId, setSelectedPaymentModeId] = useState<
+    string | null
+  >(null);
+  const [paymentModalTarget, setPaymentModalTarget] = useState<
+    "category" | "paymentMode"
+  >("paymentMode");
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
 
-  const categories = getExpenseCategoryItems();
-  const selectedCategory = categories.find((c) => c.id === selectedCatgeoryId);
+  const [amountError, setAmountError] = useState("");
+  const [categoryError, setCategoryError] = useState("");
+  const [paymentModeError, setPaymentModeError] = useState("");
+
+  const [popupState, setPopupState] = useState<{
+    isVisible: boolean;
+    type: PopupType;
+    title: string;
+    message: string;
+  }>({
+    isVisible: false,
+    type: "info",
+    title: "",
+    message: "",
+  });
+
+  const expenseCategories = getExpenseCategoryItems();
+  const incomeCategories = getIncomeCategoryItems();
+  const paymentModes = getPaymentModes();
+
+  let selectedCategory:
+    | ExpenseCategoryType
+    | IncomeCategoryType
+    | PaymentModeType
+    | undefined;
+  if (selectedOption === "Expense") {
+    selectedCategory = expenseCategories.find(
+      (c) => c.id === selectedCatgeoryId,
+    );
+  } else if (selectedOption === "Income") {
+    selectedCategory = incomeCategories.find(
+      (c) => c.id === selectedCatgeoryId,
+    );
+  } else {
+    selectedCategory = paymentModes.find((c) => c.id === selectedCatgeoryId);
+  }
+
+  const getCategoryIcon = () => {
+    if (selectedOption === "Transfer") {
+      const paymentMode = selectedCategory as PaymentModeType | undefined;
+      return paymentMode?.type === "cash"
+        ? require("@/assets/images/category/cash.png")
+        : require("@/assets/images/category/bank.png");
+    }
+    const category = selectedCategory as
+      | ExpenseCategoryType
+      | IncomeCategoryType
+      | undefined;
+    return category?.icon;
+  };
+
+  const selectedPaymentMode = paymentModes.find(
+    (p) => p.id === selectedPaymentModeId,
+  );
+  const getPaymentModeIcon = () => {
+    if (!selectedPaymentMode) return null;
+    return selectedPaymentMode.type === "cash"
+      ? require("@/assets/images/category/cash.png")
+      : require("@/assets/images/category/bank.png");
+  };
+
+  const handleCategoryClick = () => {
+    if (selectedOption === "Expense") {
+      setIsExpenseCategoryModalVisible(true);
+    } else if (selectedOption === "Income") {
+      setIsIncomeCategoryModalVisible(true);
+    } else {
+      setPaymentModalTarget("category");
+      setIsPaymentModalVisible(true);
+    }
+  };
 
   const inputRef = useRef<TextInput>(null);
   const activeColor = TRANSACTION_COLORS[selectedOption];
@@ -52,6 +144,11 @@ export default function TransactionScreen() {
       setSelectedTime(new Date());
       setAmount("");
       setNote("");
+      setSelectedCatgeoryId(null);
+      setSelectedPaymentModeId(null);
+      setAmountError("");
+      setCategoryError("");
+      setPaymentModeError("");
 
       const task = setTimeout(() => {
         inputRef.current?.focus();
@@ -59,6 +156,83 @@ export default function TransactionScreen() {
       return () => clearTimeout(task);
     }, []),
   );
+  const handleClearForm = () => {
+    setAmount("");
+    setNote("");
+    setSelectedCatgeoryId(null);
+    setSelectedPaymentModeId(null);
+    setSelectedOption("Expense");
+    setSelectedDate(new Date());
+    setSelectedTime(new Date());
+    setAmountError("");
+    setCategoryError("");
+    setPaymentModeError("");
+  };
+
+  const handleAddTransaction = () => {
+    let hasError = false;
+
+    const parsedAmount = parseFloat(amount);
+    if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) {
+      setAmountError("Please enter a valid amount");
+      hasError = true;
+    } else {
+      setAmountError("");
+    }
+
+    if (!selectedCatgeoryId) {
+      setCategoryError(
+        selectedOption === "Transfer"
+          ? "Please select source account"
+          : "Please select a category",
+      );
+      hasError = true;
+    } else {
+      setCategoryError("");
+    }
+
+    if (!selectedPaymentModeId) {
+      setPaymentModeError(
+        selectedOption === "Transfer"
+          ? "Please select destination account"
+          : "Please select a payment mode",
+      );
+      hasError = true;
+    } else {
+      setPaymentModeError("");
+    }
+
+    if (hasError) {
+      return;
+    }
+
+    try {
+      addExpense({
+        amount: parsedAmount,
+        categoryId: selectedCatgeoryId!,
+        paymentModeId: selectedPaymentModeId!,
+        date: selectedDate,
+        time: selectedTime,
+        note,
+        type: selectedOption,
+      });
+
+      handleClearForm();
+      setPopupState({
+        isVisible: true,
+        type: "success",
+        title: "Success",
+        message: "Transaction added successfully",
+      });
+    } catch (error) {
+      setPopupState({
+        isVisible: true,
+        type: "error",
+        title: "Error",
+        message: "Failed to add transaction. Please try again.",
+      });
+    }
+  };
 
   return (
     <SafeAreaView
@@ -134,23 +308,31 @@ export default function TransactionScreen() {
                   placeholderTextColor="#8E8E93"
                   style={styles.amountInput}
                   value={amount}
-                  onChangeText={setAmount}
+                  onChangeText={(val) => {
+                    setAmount(val);
+                    if (amountError) setAmountError("");
+                  }}
                 />
               </View>
+              {!!amountError && (
+                <Text style={styles.errorText}>{amountError}</Text>
+              )}
             </View>
             <View>
               <View style={styles.labelContainer}>
-                <Text style={styles.amountLabel}>Category</Text>
+                <Text style={styles.amountLabel}>
+                  {selectedOption === "Transfer" ? "From" : "Category"}
+                </Text>
               </View>
               <TouchableOpacity
                 style={styles.categoryButton}
                 activeOpacity={0.9}
-                onPress={() => setIsCategoryModalVisible(true)}
+                onPress={handleCategoryClick}
               >
                 <View style={styles.amountInputContainer}>
-                  {selectedCategory?.icon ? (
+                  {getCategoryIcon() ? (
                     <Image
-                      source={selectedCategory.icon}
+                      source={getCategoryIcon()}
                       style={styles.categoryIcon}
                       tintColor={activeColor}
                     />
@@ -163,7 +345,7 @@ export default function TransactionScreen() {
                   )}
                   <View style={styles.categoryContainer}>
                     <Text style={styles.categoryText}>
-                      {selectedCategory ? selectedCategory.name : "Category"}
+                      {selectedCategory?.name || "Category"}
                     </Text>
                   </View>
                   {/* <Text style={styles.amountInput}>Category</Text> */}
@@ -176,19 +358,45 @@ export default function TransactionScreen() {
                   />
                 </View>
               </TouchableOpacity>
+              {!!categoryError && (
+                <Text style={styles.errorText}>{categoryError}</Text>
+              )}
             </View>
             <View>
               <View style={styles.labelContainer}>
-                <Text style={styles.amountLabel}>Payment mode</Text>
+                <Text style={styles.amountLabel}>
+                  {selectedOption === "Transfer" ? "To" : "Payment mode"}
+                </Text>
               </View>
               <TouchableOpacity
                 style={styles.categoryButton}
                 activeOpacity={0.9}
+                onPress={() => {
+                  setPaymentModalTarget("paymentMode");
+                  setIsPaymentModalVisible(true);
+                }}
               >
                 <View style={styles.amountInputContainer}>
-                  <Ionicons name="cash-outline" size={24} color={activeColor} />
+                  {getPaymentModeIcon() ? (
+                    <Image
+                      source={getPaymentModeIcon()}
+                      style={styles.categoryIcon}
+                      tintColor={activeColor}
+                    />
+                  ) : (
+                    <Ionicons
+                      name="cash-outline"
+                      size={24}
+                      color={activeColor}
+                    />
+                  )}
                   <View style={styles.categoryContainer}>
-                    <Text style={styles.categoryText}>Cash</Text>
+                    <Text style={styles.categoryText}>
+                      {selectedPaymentMode?.name ||
+                        (selectedOption === "Transfer"
+                          ? "Select Account"
+                          : "Payment mode")}
+                    </Text>
                   </View>
                   {/* <Text style={styles.amountInput}>Category</Text> */}
                 </View>
@@ -200,6 +408,9 @@ export default function TransactionScreen() {
                   />
                 </View>
               </TouchableOpacity>
+              {!!paymentModeError && (
+                <Text style={styles.errorText}>{paymentModeError}</Text>
+              )}
             </View>
             <View>
               <Text style={styles.otherText}>Other details</Text>
@@ -262,6 +473,7 @@ export default function TransactionScreen() {
               styles.button,
               { backgroundColor: activeColor, shadowColor: activeColor },
             ]}
+            onPress={handleAddTransaction}
           >
             <Text style={styles.buttonText}>Save Transaction</Text>
           </TouchableOpacity>
@@ -298,14 +510,64 @@ export default function TransactionScreen() {
         />
       )}
       <ExpenseCategoryModal
-        visible={isCatgeoryModalVisible}
-        onClose={() => setIsCategoryModalVisible(false)}
+        visible={isExpenseCatgeoryModalVisible}
+        onClose={() => setIsExpenseCategoryModalVisible(false)}
         onApply={(id) => {
           setSelectedCatgeoryId(id);
-          setIsCategoryModalVisible(false);
+          if (categoryError) setCategoryError("");
+          setIsExpenseCategoryModalVisible(false);
         }}
-        categories={categories}
+        categories={expenseCategories}
         selectedId={selectedCatgeoryId}
+      />
+      <IncomeCategoryModal
+        visible={isIncomeCatgeoryModalVisible}
+        onClose={() => setIsIncomeCategoryModalVisible(false)}
+        onApply={(id) => {
+          setSelectedCatgeoryId(id);
+          if (categoryError) setCategoryError("");
+          setIsIncomeCategoryModalVisible(false);
+        }}
+        categories={incomeCategories}
+        selectedId={selectedCatgeoryId}
+      />
+      <PaymentModeModal
+        visible={isPaymentModalVisible}
+        onClose={() => setIsPaymentModalVisible(false)}
+        onApply={(id) => {
+          if (
+            selectedOption === "Transfer" &&
+            paymentModalTarget === "category"
+          ) {
+            setSelectedCatgeoryId(id);
+            if (categoryError) setCategoryError("");
+          } else {
+            setSelectedPaymentModeId(id);
+            if (paymentModeError) setPaymentModeError("");
+          }
+          setIsPaymentModalVisible(false);
+        }}
+        categories={paymentModes}
+        selectedId={
+          selectedOption === "Transfer" && paymentModalTarget === "category"
+            ? selectedCatgeoryId
+            : selectedPaymentModeId
+        }
+      />
+      <AppPopup
+        isVisible={popupState.isVisible}
+        type={popupState.type}
+        title={popupState.title}
+        message={popupState.message}
+        onPrimaryPress={() => {
+          setPopupState((prev) => ({ ...prev, isVisible: false }));
+          if (popupState.type === "success") {
+            router.back();
+          }
+        }}
+        onClose={() => {
+          setPopupState((prev) => ({ ...prev, isVisible: false }));
+        }}
       />
     </SafeAreaView>
   );
@@ -445,5 +707,12 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: normalizeFont(18),
     fontFamily: "GilroySemiBold",
+  },
+  errorText: {
+    color: "#FF453A",
+    fontSize: normalizeFont(12),
+    fontFamily: "GilroyMedium",
+    marginTop: verticalScale(4),
+    marginLeft: scale(4),
   },
 });

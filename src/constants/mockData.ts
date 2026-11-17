@@ -1,27 +1,38 @@
-import { ExpenseCategoryType, IncomeCategoryType } from "./types";
+import {
+  BankType,
+  ExpenseCategoryType,
+  IncomeCategoryType,
+  PaymentModeType,
+} from "./types";
 
 export const getExpenseCategoryItems = (): ExpenseCategoryType[] => {
   return [
     {
       id: "1",
+      icon: require("@/assets/images/category/other.png"),
+      name: "Others",
+      color: "#1E90FF",
+    },
+    {
+      id: "2",
       icon: require("@/assets/images/category/food.png"),
       name: "Food and Drinks",
       color: "#50C878",
     },
     {
-      id: "2",
+      id: "3",
       icon: require("@/assets/images/category/travel.png"),
       name: "Travelling",
       color: "#FF8C00",
     },
     {
-      id: "3",
+      id: "4",
       icon: require("@/assets/images/category/shopping.png"),
       name: "Shopping",
-      color: "#007FFF",
+      color: "#D0417E",
     },
     {
-      id: "4",
+      id: "5",
       icon: require("@/assets/images/category/bill.png"),
       name: "Bills & Utilities",
       color: "#D0417E",
@@ -34,8 +45,8 @@ export const getExpenseCategoryItems = (): ExpenseCategoryType[] => {
     },
     {
       id: "7",
-      icon: require("@/assets/images/category/hospital.png"),
-      name: "Medical",
+      icon: require("@/assets/images/category/health.png"),
+      name: "Medicine & Supplements",
       color: "#50C878",
     },
     {
@@ -48,91 +59,74 @@ export const getExpenseCategoryItems = (): ExpenseCategoryType[] => {
       id: "9",
       icon: require("@/assets/images/category/education.png"),
       name: "Education",
-      color: "#B8860B",
+      color: "#FF8C00",
     },
     {
       id: "10",
       icon: require("@/assets/images/category/investment.png"),
       name: "Investment",
-      color: "#73C2FB",
+      color: "#D0417E",
     },
     {
       id: "11",
       icon: require("@/assets/images/category/insurance.png"),
       name: "Insurance",
-      color: "#50C878",
+      color: "#1E90FF",
     },
     {
       id: "12",
       icon: require("@/assets/images/category/lend.png"),
       name: "Lend Money",
-      color: "#90EE90",
+      color: "#50C878",
     },
     {
       id: "13",
       icon: require("@/assets/images/category/pet.png"),
       name: "Pet Care",
-      color: "#6F00FF",
+      color: "#D0417E",
     },
     {
       id: "14",
       icon: require("@/assets/images/category/rent.png"),
       name: "Rent",
-      color: "#1E90FF",
+      color: "#50C878",
     },
     {
-      id: "16",
-      icon: require("@/assets/images/category/gym.png"),
-      name: "Gym & Fitness",
+      id: "15",
+      icon: require("@/assets/images/category/membership.png"),
+      name: "Memberships",
       color: "#FF8C00",
     },
     {
-      id: "17",
+      id: "16",
       icon: require("@/assets/images/category/fuel.png"),
       name: "Fuel & Gas",
       color: "#1E90FF",
     },
     {
-      id: "18",
+      id: "17",
       icon: require("@/assets/images/category/grocery.png"),
       name: "Grocery",
-      color: "#6C541E",
-    },
-    {
-      id: "19",
-      icon: require("@/assets/images/category/carMaintenance.png"),
-      name: "Vehicle Maintenance",
       color: "#50C878",
     },
     {
-      id: "20",
-      icon: require("@/assets/images/category/donation.png"),
-      name: "Donations",
-      color: "#FF91A4",
-    },
-    {
-      id: "21",
+      id: "18",
       icon: require("@/assets/images/category/gift.png"),
-      name: "Gifts",
+      name: "Gifts & Donations",
       color: "#FF8C00",
     },
     {
-      id: "22",
+      id: "19",
       icon: require("@/assets/images/category/home.png"),
       name: "Home",
       color: "#1E90FF",
     },
+
     {
-      id: "23",
-      icon: require("@/assets/images/category/other.png"),
-      name: "Others",
-      color: "#FFBF00",
-    },
-    {
-      id: "24",
+      id: "20",
       icon: require("@/assets/images/category/tax.png"),
       name: "Taxes",
-      color: "#004953",
+      color: "#D0417E",
     },
   ];
 };
@@ -141,141 +135,95 @@ export const getIncomeCategoryItems = (): IncomeCategoryType[] => {
   return [
     {
       id: "1",
-      icon: require("@/assets/images/category/food.png"),
-      name: "Food and Drinks",
-      color: "#50C878",
+      icon: require("@/assets/images/category/other.png"),
+      name: "Others",
+      color: "#1E90FF",
     },
     {
       id: "2",
-      icon: require("@/assets/images/category/travel.png"),
-      name: "Travelling",
+      icon: require("@/assets/images/category/salary.png"),
+      name: "Salary",
       color: "#FF8C00",
     },
     {
       id: "3",
-      icon: require("@/assets/images/category/shopping.png"),
-      name: "Shopping",
-      color: "#007FFF",
-    },
-    {
-      id: "4",
-      icon: require("@/assets/images/category/bill.png"),
-      name: "Bills & Utilities",
+      icon: require("@/assets/images/category/sold.png"),
+      name: "Sold Items",
       color: "#D0417E",
     },
     {
-      id: "5",
-      icon: require("@/assets/images/category/utility.png"),
-      name: "Utilities",
-      color: "#1E90FF",
-    },
-    {
-      id: "6",
-      icon: require("@/assets/images/category/entertainment.png"),
-      name: "Entertainment",
-      color: "#1E90FF",
-    },
-    {
-      id: "7",
-      icon: require("@/assets/images/category/hospital.png"),
-      name: "Medical",
+      id: "4",
+      icon: require("@/assets/images/category/freelance.png"),
+      name: "Freelancing",
       color: "#50C878",
-    },
-    {
-      id: "8",
-      icon: require("@/assets/images/category/selfCare.png"),
-      name: "Personal Care",
-      color: "#FF8C00",
-    },
-    {
-      id: "9",
-      icon: require("@/assets/images/category/education.png"),
-      name: "Education",
-      color: "#B8860B",
-    },
-    {
-      id: "10",
-      icon: require("@/assets/images/category/investment.png"),
-      name: "Investment",
-      color: "#73C2FB",
-    },
-    {
-      id: "11",
-      icon: require("@/assets/images/category/insurance.png"),
-      name: "Insurance",
-      color: "#50C878",
-    },
-    {
-      id: "12",
-      icon: require("@/assets/images/category/lend.png"),
-      name: "Lend Money",
-      color: "#90EE90",
-    },
-    {
-      id: "13",
-      icon: require("@/assets/images/category/pet.png"),
-      name: "Pet Care",
-      color: "#6F00FF",
-    },
-    {
-      id: "14",
-      icon: require("@/assets/images/category/rent.png"),
-      name: "Rent",
-      color: "#1E90FF",
-    },
-    {
-      id: "16",
-      icon: require("@/assets/images/category/gym.png"),
-      name: "Gym & Fitness",
-      color: "#FF8C00",
-    },
-    {
-      id: "17",
-      icon: require("@/assets/images/category/fuel.png"),
-      name: "Fuel & Gas",
-      color: "#1E90FF",
-    },
-    {
-      id: "18",
-      icon: require("@/assets/images/category/grocery.png"),
-      name: "Grocery",
-      color: "#6C541E",
-    },
-    {
-      id: "19",
-      icon: require("@/assets/images/category/carMaintenance.png"),
-      name: "Vehicle Maintenance",
-      color: "#50C878",
-    },
-    {
-      id: "20",
-      icon: require("@/assets/images/category/donation.png"),
-      name: "Donations",
-      color: "#FF91A4",
-    },
-    {
-      id: "21",
-      icon: require("@/assets/images/category/gift.png"),
-      name: "Gifts",
-      color: "#FF8C00",
-    },
-    {
-      id: "22",
-      icon: require("@/assets/images/category/home.png"),
-      name: "Home",
-      color: "#1E90FF",
-    },
-    {
-      id: "23",
-      icon: require("@/assets/images/category/other.png"),
-      name: "Others",
-      color: "#FFBF00",
-    },
-    {
-      id: "24",
-      icon: require("@/assets/images/category/tax.png"),
-      name: "Taxes",
-      color: "#004953",
     },
   ];
+};
+
+export const getPaymentMode = (): PaymentModeType[] => {
+  return [
+    {
+      id: "1",
+      type: "cash",
+      name: "Cash",
+      balance: "1000",
+    },
+    {
+      id: "2",
+      type: "bank",
+      name: "Bank of Baroda",
+      balance: "2000",
+    },
+    {
+      id: "3",
+      type: "bank",
+      name: "Axis Bank",
+      balance: "-3000",
+    },
+    {
+      id: "4",
+      type: "bank",
+      name: "HDFC Bank",
+      balance: "-3000",
+    },
+  ];
+};
+
+export const getBanks = (): BankType[] => {
+  return [
+    {
+      id: "1",
+      category: "bank",
+      name: "Bank of Baroda",
+      balance: "1000",
+    },
+    {
+      id: "2",
+      category: "bank",
+      name: "Axis Bank",
+      balance: "2000",
+    },
+    {
+      id: "3",
+      category: "bank",
+      name: "HDFC Bank",
+      balance: "-3000",
+    },
+  ];
+};
+
+export const getCategoryById = (
+  id?: string | number | null,
+  type?: string,
+): ExpenseCategoryType | IncomeCategoryType | undefined => {
+  if (!id) return undefined;
+  const strId = String(id);
+  if (type === "Income") {
+    const incomeMatch = getIncomeCategoryItems().find((c) => c.id === strId);
+    if (incomeMatch) return incomeMatch;
+    return getExpenseCategoryItems().find((c) => c.id === strId);
+  }
+  const expenseMatch = getExpenseCategoryItems().find((c) => c.id === strId);
+  if (expenseMatch) return expenseMatch;
+  return getIncomeCategoryItems().find((c) => c.id === strId);
 };

@@ -123,14 +123,17 @@ export const IncomeCategoryModal: React.FC<IncomeCategoryModalProps> = ({
                     <View
                       style={[
                         isSelected
-                          ? styles.isCategorySelected
+                          ? [
+                              styles.isCategorySelected,
+                              { backgroundColor: category.color },
+                            ]
                           : styles.imageWrapper,
                       ]}
                     >
                       <Image
                         source={category.icon}
                         style={styles.categoryIcon}
-                        tintColor={isSelected ? "#000000" : "#00FFFF"}
+                        tintColor={isSelected ? "#000000" : category.color}
                         resizeMode="contain"
                       />
                     </View>
@@ -139,7 +142,7 @@ export const IncomeCategoryModal: React.FC<IncomeCategoryModalProps> = ({
                       style={[
                         styles.optionText,
                         isSelected
-                          ? { color: "#52B3AD" }
+                          ? { color: category.color }
                           : { color: "#FFFFFF" },
                       ]}
                     >
@@ -183,7 +186,7 @@ const styles = StyleSheet.create({
   },
   dragHandleContainer: {
     alignItems: "center",
-    marginBottom: verticalScale(24),
+    marginBottom: verticalScale(34),
   },
   dragHandle: {
     width: scale(40),
@@ -199,13 +202,13 @@ const styles = StyleSheet.create({
   optionRow: {
     width: "25%",
     alignItems: "center",
-    paddingVertical: verticalScale(10),
+    paddingVertical: verticalScale(15),
   },
   imageWrapper: {
     width: scale(48),
     height: scale(48),
     borderRadius: scale(48),
-    opacity: scale(0.5),
+    // opacity: scale(0.5),
     justifyContent: "center",
     alignItems: "center",
     marginBottom: scale(2),
@@ -214,7 +217,6 @@ const styles = StyleSheet.create({
     width: scale(48),
     height: scale(48),
     borderRadius: scale(48),
-    backgroundColor: "#52B3AD",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: scale(2),
@@ -229,12 +231,12 @@ const styles = StyleSheet.create({
     height: scale(35),
   },
   optionText: {
-    fontSize: normalizeFont(14),
+    fontSize: normalizeFont(11),
     fontFamily: "GilroyMedium",
     textAlign: "center",
   },
   selectedOptionText: {
-    fontSize: normalizeFont(14),
+    fontSize: normalizeFont(11),
     fontFamily: "GilroyMedium",
     color: "#52B3AD",
   },
